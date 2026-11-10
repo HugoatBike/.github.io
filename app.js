@@ -50,10 +50,20 @@ async function sendCmd(cmd) {
 }
 
 function setupMobileControls() {
-    // Gestion unique du bouton de connexion Bluetooth (Toggle)
-    document.getElementById('btn-bluetooth').addEventListener('click', handleBluetoothToggle);
+    // ⚠️ CRUCIAL : Web Bluetooth exige un 'click' classique pour ouvrir la boîte de dialogue
+    const btnBluetooth = document.getElementById('btn-bluetooth');
+    if (btnBluetooth) {
+        btnBluetooth.replaceWith(btnBluetooth.cloneNode(true)); // Nettoie les anciens écouteurs résiduels
+    }
 
-    // Événements tactiles haute performance (pointerdown) pour la course
+    document.getElementById('btn-bluetooth').addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Clic détecté sur le bouton Bluetooth");
+        await handleBluetoothToggle();
+    });
+
+    // Les zones de jeu peuvent rester en tactile rapide (pointerdown) car elles n'ouvrent pas de fenêtre
     document.getElementById('zone-p1').addEventListener('pointerdown', (e) => {
         e.preventDefault();
         sendCmd('p1_accel');
@@ -64,11 +74,11 @@ function setupMobileControls() {
         sendCmd('p2_accel');
     });
 
-    // Reset du jeu
     document.getElementById('btn-reset-game').addEventListener('click', () => {
         sendCmd('reset');
     });
 }
+
 
 function updateConnectionStatus(isConnected) {
     const statusEl = document.getElementById('status');
