@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -7,7 +8,8 @@
     <link rel="manifest" href="manifest.json">
     <style>
         /* Bloquer le défilement et les gestes natifs du téléphone */
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -34,7 +36,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }
 
         .btn-status {
@@ -46,7 +48,11 @@
             cursor: pointer;
         }
 
-        #status { font-weight: bold; color: #ff4757; margin-left: 5px; }
+        #status {
+            font-weight: bold;
+            color: #ff4757;
+            margin-left: 5px;
+        }
 
         /* Zones de jeu plein écran pour les deux joueurs */
         .game-container {
@@ -62,7 +68,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            touch-action: none; /* Évite les latences du double-clic sur téléphone */
+            touch-action: none;
+            /* Évite les latences du double-clic sur téléphone */
             transition: background 0.1s ease;
         }
 
@@ -71,22 +78,28 @@
             background: linear-gradient(180deg, #801414 0%, #b31919 100%);
             border-bottom: 2px dashed #fff;
         }
-        #zone-p1:active { background: #ff4757; }
+
+        #zone-p1:active {
+            background: #ff4757;
+        }
 
         /* Joueur 2 en bas - Zone Verte */
         #zone-p2 {
             background: linear-gradient(180deg, #13632f 0%, #1b8a41 100%);
         }
-        #zone-p2:active { background: #2ed573; }
+
+        #zone-p2:active {
+            background: #2ed573;
+        }
 
         .zone-title {
             font-size: 28px;
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: 900;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
-        
+
         .zone-sub {
             font-size: 14px;
             opacity: 0.7;
@@ -107,18 +120,23 @@
             font-size: 18px;
             width: 45px;
             height: 45px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
+
 <body>
 
 
-    <div style="font-size: 13px;">
-    Statut: <span id="status">Déconnecté</span> 
-    <span id="device-connected-name" style="font-weight: bold; color: #ffa502; margin-left: 5px;"></span>
-</div>
+    <div class="header-bar">
+        <button id="btn-bluetooth" class="btn-status" style="background-color: #0084ff; color: white;">🔗
+            Bluetooth</button>
+        <div style="font-size: 13px;">
+            Statut: <span id="status">Déconnecté</span>
+            <span id="device-connected-name" style="font-weight: bold; color: #ffa502; margin-left: 5px;"></span>
+        </div>
 
+    </div>
 
 
     <button id="btn-reset-game" class="btn-reset" title="Réinitialiser la course">🔄</button>
@@ -136,4 +154,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>
