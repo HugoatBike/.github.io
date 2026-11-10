@@ -2,53 +2,56 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>OpenLED Race - Mobile</title>
     <link rel="manifest" href="manifest.json">
     <style>
-        /* Bloquer le défilement et les gestes natifs du téléphone */
+        /* Verrouillage complet du défilement et zoom sur mobile */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #111;
             color: #fff;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        /* Barre d'outils supérieure pour la connexion Bluetooth */
+        /* Centre de contrôle Bluetooth flottant au milieu de l'écran */
         .header-bar {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
-            background: rgba(0, 0, 0, 0.85);
-            padding: 10px 20px;
+            background: rgba(15, 15, 15, 0.95);
+            padding: 12px 24px;
             border-radius: 30px;
-            border: 2px solid #555;
+            border: 2px solid #444;
             display: flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            gap: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.7);
         }
 
         .btn-status {
-            padding: 8px 15px;
+            padding: 10px 20px;
             font-size: 14px;
             border-radius: 20px;
             border: none;
             font-weight: bold;
             cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
         }
 
-        #status { font-weight: bold; color: #ff4757; margin-left: 5px; }
+        #status { font-weight: bold; color: #ff4757; }
 
-        /* Zones de jeu plein écran pour les deux joueurs */
+        /* Conteneur d'écran partagé à 50/50 */
         .game-container {
             display: flex;
             flex-direction: column;
@@ -62,77 +65,89 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            touch-action: none; /* Évite les latences du double-clic sur téléphone */
-            transition: background 0.1s ease;
+            touch-action: none; /* Supprime le délai tactile de 300ms sur mobile */
+            transition: background 0.05s ease;
         }
 
-        /* Joueur 1 en haut - Zone Rouge */
+        /* Zone Joueur 1 (Haut de l'écran - Teinte rouge) */
         #zone-p1 {
-            background: linear-gradient(180deg, #801414 0%, #b31919 100%);
-            border-bottom: 2px dashed #fff;
+            background: linear-gradient(180deg, #6b0f0f 0%, #991414 100%);
+            border-bottom: 2px dashed rgba(255,255,255,0.4);
         }
-        #zone-p1:active { background: #ff4757; }
+        #zone-p1:active { background: #ff3838; }
 
-        /* Joueur 2 en bas - Zone Verte */
+        /* Zone Joueur 2 (Bas de l'écran - Teinte verte) */
         #zone-p2 {
-            background: linear-gradient(180deg, #13632f 0%, #1b8a41 100%);
+            background: linear-gradient(180deg, #0d5225 0%, #147333 100%);
         }
         #zone-p2:active { background: #2ed573; }
 
         .zone-title {
-            font-size: 28px;
+            font-size: 32px;
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: 900;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 4px 6px rgba(0,0,0,0.6);
         }
         
         .zone-sub {
-            font-size: 14px;
-            opacity: 0.7;
-            margin-top: 5px;
+            font-size: 13px;
+            opacity: 0.6;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* Bouton discret de reset global */
+        /* Bouton Reset de secours positionné sur le côté */
         .btn-reset {
             position: absolute;
-            bottom: 15px;
+            top: 15px;
             right: 15px;
             z-index: 11;
             background: #ffa502;
             color: #000;
             border: none;
-            padding: 10px;
+            padding: 0;
             border-radius: 50%;
-            font-size: 18px;
-            width: 45px;
-            height: 45px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            font-size: 20px;
+            width: 48px;
+            height: 48px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+        .btn-reset:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
 
-
+    <!-- Barre d'outils d'appairage Bluetooth -->
     <div class="header-bar">
         <button id="btn-bluetooth" class="btn-status" style="background-color: #0084ff; color: white;">🔗 Bluetooth</button>
-        <div style="font-size: 13px;">Statut: <span id="status">Déconnecté</span></div>
+        <div style="font-size: 13px; white-space: nowrap;">
+            <span id="status">Déconnecté</span> 
+            <span id="device-connected-name" style="font-weight: bold; color: #ffa502; margin-left: 3px;"></span>
+        </div>
     </div>
 
-
+    <!-- Bouton Réinitialiser la partie -->
     <button id="btn-reset-game" class="btn-reset" title="Réinitialiser la course">🔄</button>
 
+    <!-- Zone de tapotement pour les deux pilotes -->
     <div class="game-container">
         <div id="zone-p1" class="player-zone">
             <div class="zone-title">Joueur 1 🏎️</div>
-            <div class="zone-sub">TAPOTEZ ICI POUR ACCÉLÉRER</div>
+            <div class="zone-sub">Tapotez cet écran pour foncer</div>
         </div>
         <div id="zone-p2" class="player-zone">
             <div class="zone-title">Joueur 2 🏁</div>
-            <div class="zone-sub">TAPOTEZ ICI POUR ACCÉLÉRER</div>
+            <div class="zone-sub">Tapotez cet écran pour foncer</div>
         </div>
     </div>
 
+    <!-- Lien vers notre script adapté -->
     <script src="app.js"></script>
 </body>
 </html>
