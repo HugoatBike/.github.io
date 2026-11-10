@@ -69,22 +69,32 @@ function setupMobileControls() {
         sendCmd('reset');
     });
 }
-
 function updateConnectionStatus(isConnected) {
     const statusEl = document.getElementById('status');
+    const nameEl = document.getElementById('device-connected-name');
     const btnBluetooth = document.getElementById('btn-bluetooth');
-    if (isConnected) {
-        statusEl.innerText = "Connecté";
+    
+    if (isConnected && device) {
+        statusEl.innerText = "Connecté à :";
         statusEl.style.color = "#2ed573";
+        
+        // Récupère le nom de l'appareil, ou affiche "Appareil Inconnu" s'il n'a pas de nom public
+        nameEl.innerText = device.name ? device.name : "Appareil sans nom";
+        
         btnBluetooth.innerText = "🔌 Déconnecter";
         btnBluetooth.style.backgroundColor = "#747d8c";
     } else {
         statusEl.innerText = "Déconnecté";
         statusEl.style.color = "#ff4757";
+        
+        // Efface le nom de l'appareil lors de la déconnexion
+        nameEl.innerText = "";
+        
         btnBluetooth.innerText = "🔗 Bluetooth";
         btnBluetooth.style.backgroundColor = "#0084ff";
     }
 }
+
 
 // Service Worker (votre code d'origine pour le mode PWA/téléphone offline)
 if ('serviceWorker' in navigator) {
