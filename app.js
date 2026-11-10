@@ -19,43 +19,15 @@ async function handleBluetoothToggle() {
         console.log("Tentative de connexion...");
         try {
             // Demande d'accès ou récupération des périphériques connus
-            async function connect() {
-    console.log("connect called");
-    try {
-        let devices = await navigator.bluetooth.getDevices();
-        
-        // Si le téléphone ne se rappelle d'aucun appareil, on lance une recherche fraîche
-        if (devices.length === 0) {
-            console.log("Aucun appareil en cache. Lancement de pair()...");
-            device = await pair();
-        } else {
-            // On récupère le périphérique que l'utilisateur a déjà associé
-            device = devices[0]; 
-        }
-
-        if (!device) {
-            console.log("Connexion annulée par l'utilisateur ou aucun appareil choisi.");
-            return;
-        }
-
-        console.log("Connexion au serveur GATT pour : " + (device.name || "Appareil sans nom"));
-        const server = await device.gatt.connect();
-        
-        const service = await server.getPrimaryService(serviceUuid);
-        tx = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-        
-        console.log("Canal de transmission activé !");
-        updateConnectionStatus(true);
-    }
-    catch (error) {
-        console.error('Erreur de connexion Bluetooth : ', error);
-        updateConnectionStatus(false);
-        
-        // Si le cache est corrompu ou l'appareil hors de portée, on force une nouvelle recherche au clic suivant
-        device = null; 
-    }
-}
-
+            let devices = await navigator.bluetooth.getDevices();
+            if (devices.length === 0) {
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: [serviceUuid] }],
+                    optionalServices: ['battery_service']
+                });
+            } else {
+                device = devices[0];
+            }
 
             const server = await device.gatt.connect();
             const service = await server.getPrimaryService(serviceUuid);
@@ -97,32 +69,22 @@ function setupMobileControls() {
         sendCmd('reset');
     });
 }
+
 function updateConnectionStatus(isConnected) {
     const statusEl = document.getElementById('status');
-    const nameEl = document.getElementById('device-connected-name');
     const btnBluetooth = document.getElementById('btn-bluetooth');
-    
-    if (isConnected && device) {
-        statusEl.innerText = "Connecté à :";
+    if (isConnected) {
+        statusEl.innerText = "Connecté";
         statusEl.style.color = "#2ed573";
-        
-        // Récupère le nom de l'appareil, ou affiche "Appareil Inconnu" s'il n'a pas de nom public
-        nameEl.innerText = device.name ? device.name : "Appareil sans nom";
-        
         btnBluetooth.innerText = "🔌 Déconnecter";
         btnBluetooth.style.backgroundColor = "#747d8c";
     } else {
         statusEl.innerText = "Déconnecté";
         statusEl.style.color = "#ff4757";
-        
-        // Efface le nom de l'appareil lors de la déconnexion
-        nameEl.innerText = "";
-        
         btnBluetooth.innerText = "🔗 Bluetooth";
         btnBluetooth.style.backgroundColor = "#0084ff";
     }
 }
-
 
 // Service Worker (votre code d'origine pour le mode PWA/téléphone offline)
 if ('serviceWorker' in navigator) {
